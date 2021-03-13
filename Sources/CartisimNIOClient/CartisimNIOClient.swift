@@ -57,27 +57,24 @@ public class CartisimNIOClient {
     }
     
     //Run the program
-    public func run() throws {
+    public func run() {
         
-        try? clientBootstrap()
+        do {
+            try clientBootstrap()
             .connect(host: host, port: port)
             .map { channel -> () in
                 self.channel = channel
             }.wait()
-        
-        
-        guard let localAddress = channel?.localAddress else {
-            fatalError("Address was unable to bind. Please check that the socket was not closed or that the address family was understood.")
+        } catch {
+            print("Error caught running program: \(error)")
         }
-        
-        print("Client started and listening on \(localAddress)")
     }
     
     //Shutdown the program
     public func shutdown() {
         do {
             try group.syncShutdownGracefully()
-        } catch let error {
+        } catch {
             print("Could not gracefully shutdown, Forcing the exit (\(error)")
             exit(0)
         }

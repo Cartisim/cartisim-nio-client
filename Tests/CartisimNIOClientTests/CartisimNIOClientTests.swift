@@ -9,8 +9,7 @@ final class CartisimNIOClientTests: XCTestCase {
         // Use XCTAssert and related functions to verify your tests produce the correct
         // results.
         let cartisimNIOClient = CartisimNIOClient(host: "localhost", port: 8081)
-        do {
-            try cartisimNIOClient.run()
+             cartisimNIOClient.run()
             
             guard let data = chatData else {return}
             cartisimNIOClient.send(chat: data)
@@ -20,9 +19,6 @@ final class CartisimNIOClientTests: XCTestCase {
             }
             
             cartisimNIOClient.shutdown()
-        } catch {
-            XCTFail("\(error)")
-        }
     }
     
     static var allTests = [
