@@ -3,24 +3,6 @@
 
 import PackageDescription
 
-var targets: [PackageDescription.Target] = [
-    .target(
-        name: "CartisimNIOClient",
-        dependencies: [
-            .product(name: "NIOExtras", package: "swift-nio-extras"),
-            .product(name: "NIOTransportServices", package: "swift-nio-transport-services")
-        ],
-        swiftSettings: [
-        // Enable better optimizations when building in Release configuration. Despite the use of
-        // the `.unsafeFlags` construct required by SwiftPM, this flag is recommended for Release
-        // builds. See <https://github.com/swift-server/guides#building-for-production> for details.
-        .unsafeFlags(["-cross-module-optimization"], .when(configuration: .release))
-        ]
-    ),
-    .testTarget(name: "CartisimNIOClientTests", dependencies: ["CartisimNIOClient"]),
-    
-]
-
 let package = Package(
     name: "cartisim-nio-client",
     platforms: [
@@ -41,5 +23,20 @@ let package = Package(
         .package(url: "https://github.com/apple/swift-nio-extras.git", from: "1.8.0"),
         .package(url: "https://github.com/apple/swift-nio-transport-services.git", from: "1.9.2"),
     ],
-    targets: targets
+    targets: [
+        .target(
+            name: "CartisimNIOClient",
+            dependencies: [
+                .product(name: "NIOExtras", package: "swift-nio-extras"),
+                .product(name: "NIOTransportServices", package: "swift-nio-transport-services")
+            ],
+            swiftSettings: [
+            // Enable better optimizations when building in Release configuration. Despite the use of
+            // the `.unsafeFlags` construct required by SwiftPM, this flag is recommended for Release
+            // builds. See <https://github.com/swift-server/guides#building-for-production> for details.
+            .unsafeFlags(["-cross-module-optimization"], .when(configuration: .release))
+            ]
+        ),
+        .testTarget(name: "CartisimNIOClientTests", dependencies: ["CartisimNIOClient"]),
+    ]
 )
