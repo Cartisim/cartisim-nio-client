@@ -1,6 +1,6 @@
 # CartisimNIOClient
 
-A simple SwiftNIO TCP Client for Chat Applications. This project is designed to use both NIOTS and BSD Sockets for Cross Platform Scalability.
+A simple SwiftNIO TCP Client for Chat Applications. This project is designed to use NIOTS and in the future BSD Sockets for Cross Platform Scalability.
 
 ## Getting Started
 

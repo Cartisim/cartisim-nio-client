@@ -13,8 +13,8 @@ import NIOTransportServices
 
 public class CartisimNIOClient {
     
-    private var host: String?
-    private var port: Int?
+    private var host: String
+    private var port: Int
     private var channel: Channel? = nil
     private var chatHandler = ChatHandler()
     private let group = NIOTSEventLoopGroup()
@@ -58,14 +58,9 @@ public class CartisimNIOClient {
     
     //Run the program
     public func run() throws {
-        guard let host = host else {
-            throw TCPError.invalidHost
-        }
-        guard let port = port else {
-            throw TCPError.invalidPort
-        }
         
-        try? clientBootstrap().connect(host: host, port: port)
+        try? clientBootstrap()
+            .connect(host: host, port: port)
             .map { channel -> () in
                 self.channel = channel
             }.wait()
@@ -74,6 +69,7 @@ public class CartisimNIOClient {
         guard let localAddress = channel?.localAddress else {
             fatalError("Address was unable to bind. Please check that the socket was not closed or that the address family was understood.")
         }
+        
         print("Client started and listening on \(localAddress)")
     }
     

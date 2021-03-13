@@ -32,9 +32,7 @@ class ChatHandler: ChannelOutboundHandler, ChannelInboundHandler {
     }
     
     public func channelActive(context: ChannelHandlerContext) {
-        #if DEBUG
         print("Chat Client connected to \(context.remoteAddress!)")
-        #endif
     }
     
     
