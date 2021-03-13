@@ -28,7 +28,7 @@ public class CartisimNIOClient {
     
     private func makeNIOHandlers() -> [ChannelHandler] {
         return [
-//            ByteToMessageHandler(LineBasedFrameDecoder()),
+            //            ByteToMessageHandler(LineBasedFrameDecoder()),
             self.chatHandler
         ]
     }
@@ -58,15 +58,21 @@ public class CartisimNIOClient {
     
     //Run the program
     public func run() {
-        
-        do {
-            try clientBootstrap()
+        let messageSentPromise: EventLoopPromise<Void> = group.next().makePromise()
+        let connection = clientBootstrap()
             .connect(host: host, port: port)
             .map { channel -> () in
                 self.channel = channel
-            }.wait()
-        } catch {
-            print("Error caught running program: \(error)")
+            }
+        connection.cascadeFailure(to: messageSentPromise)
+        messageSentPromise.futureResult.map {
+            connection.whenSuccess {
+                guard let address = self.channel?.remoteAddress else {return}
+                print("ChatClient connected to ChatServer: \(address)")
+            }
+        }.whenFailure { error in
+            print("CartisimNIOClient failed to run for the following reason: \(error)")
+            self.shutdown()
         }
     }
     
