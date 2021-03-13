@@ -10,7 +10,6 @@ let package = Package(
         .iOS(.v14),
         .tvOS(.v14),
         .watchOS(.v7)
-            
     ],
     products: [
         // Products define the executables and libraries a package produces, and make them visible to other packages.
@@ -29,12 +28,6 @@ let package = Package(
             dependencies: [
                 .product(name: "NIOExtras", package: "swift-nio-extras"),
                 .product(name: "NIOTransportServices", package: "swift-nio-transport-services")
-            ],
-            swiftSettings: [
-            // Enable better optimizations when building in Release configuration. Despite the use of
-            // the `.unsafeFlags` construct required by SwiftPM, this flag is recommended for Release
-            // builds. See <https://github.com/swift-server/guides#building-for-production> for details.
-            .unsafeFlags(["-cross-module-optimization"], .when(configuration: .release))
             ]
         ),
         .testTarget(name: "CartisimNIOClientTests", dependencies: ["CartisimNIOClient"]),
