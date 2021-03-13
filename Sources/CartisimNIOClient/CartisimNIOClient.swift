@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Network
 import NIO
 import NIOExtras
 import NIOTransportServices
