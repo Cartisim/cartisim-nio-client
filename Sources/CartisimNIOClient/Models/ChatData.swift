@@ -9,7 +9,7 @@
 import Foundation
 
 public struct ChatData {
-    let data: Data
+    public let data: Data
     
     internal init(data: Data) {
         self.data = data
