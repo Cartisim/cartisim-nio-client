@@ -20,20 +20,20 @@ public class CartisimNIOClient {
     private let group = NIOTSEventLoopGroup()
     public var onDataReceived: ServerDataReceived?
     
-    init(host: String, port: Int) {
+    public init(host: String, port: Int) {
         self.host = host
         self.port = port
     }
     
     
-    func makeNIOHandlers() -> [ChannelHandler] {
+    private func makeNIOHandlers() -> [ChannelHandler] {
         return [
 //            ByteToMessageHandler(LineBasedFrameDecoder()),
             self.chatHandler
         ]
     }
     
-    func clientBootstrap() -> NIOTSConnectionBootstrap {
+    private func clientBootstrap() -> NIOTSConnectionBootstrap {
         let bootstrap: NIOTSConnectionBootstrap
         #if DEBUG || LOCAL
         bootstrap = NIOTSConnectionBootstrap(group: group)
@@ -57,7 +57,7 @@ public class CartisimNIOClient {
     }
     
     //Run the program
-    func run() throws {
+    public func run() throws {
         guard let host = host else {
             throw TCPError.invalidHost
         }
@@ -78,7 +78,7 @@ public class CartisimNIOClient {
     }
     
     //Shutdown the program
-    func shutdown() {
+    public func shutdown() {
         do {
             try group.syncShutdownGracefully()
         } catch let error {
@@ -89,14 +89,14 @@ public class CartisimNIOClient {
     }
     
     //Send data to the Server
-    func send(chat: Data) {
+    public func send(chat: Data) {
         let buffer = ByteBuffer(data: chat)
         channel?.writeAndFlush(chatHandler.wrapOutboundOut(buffer), promise: nil)
         dataReceived()
     }
     
     //Handle Data received from server
-    func dataReceived() {
+    private func dataReceived() {
         chatHandler.dataReceived = { [weak self] data in
             guard let strongSelf = self else {return}
             guard let receivedData = strongSelf.onDataReceived else {return}
