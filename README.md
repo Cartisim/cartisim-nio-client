@@ -60,6 +60,16 @@ cartisimNIOClient?.onDataReceived = { [weak self] dataObject in
 
 print("do stuff with data \(dataObject)")
 
+//If you are encrypting your messages then you can just do whatever you want with your dataObject
+
+}
+
+func didReceivedEncryptedData() {
+
+cartisimNIOClient?.onEncryptedDataReceived = { [weak self] dataObject in
+
+print("do stuff with data \(dataObject)")
+
 //Here are some example of what you can do
 
 guard let strongSelf = self else { return }
@@ -69,8 +79,6 @@ guard let decryptedObject = strongSelf.networkUtility.networkWrapper.someDecrypt
 
 let decryptedName = strongSelf.someCrypto.decryptText(text: dataObject.name, symmetricKey: "key")
 let decryptedMessage = strongSelf.someCrypto.decryptText(text: dataObject.message, symmetricKey: "key")
-
-//If you are encrypting your messages then you can just do whatever you want with your dataObject
 
 }
 

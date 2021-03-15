@@ -10,7 +10,7 @@ public struct MessageData: Codable {
     var sessionID: String? = ""
     var chatSessionID: String? = ""
     
-    public init(avatar: String? = "", userID: String? = "", name: String? = "", message: String? = "", accessToken: String? = "", refreshToken: String? = "", sessionID: String? = "", chatSessionID: String? = "") {
+    internal init(avatar: String? = "", userID: String? = "", name: String? = "", message: String? = "", accessToken: String? = "", refreshToken: String? = "", sessionID: String? = "", chatSessionID: String? = "") {
         self.avatar = avatar
         self.userID = userID
         self.name = name

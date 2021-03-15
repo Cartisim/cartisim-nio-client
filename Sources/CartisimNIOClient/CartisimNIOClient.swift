@@ -50,7 +50,7 @@ public class CartisimNIOClient {
         let bootstrap: NIOTSConnectionBootstrap
         #if DEBUG || LOCAL
         bootstrap = NIOTSConnectionBootstrap(group: group)
-            .connectTimeout(.hours(1))
+            .connectTimeout(.seconds(3))
             .channelOption(ChannelOptions.socket(IPPROTO_TCP, TCP_NODELAY), value: 1)
             .channelInitializer { channel in
                 channel.pipeline.addHandlers(self.makeNIOHandlers())
@@ -92,8 +92,7 @@ public class CartisimNIOClient {
     //Shutdown the program
     public func disconnect() {
         do {
-//            try group.syncShutdownGracefully()
-            try group.next().close()
+            try group.syncShutdownGracefully()
         } catch {
             print("Could not gracefully shutdown, Forcing the exit (\(error)")
             exit(0)
