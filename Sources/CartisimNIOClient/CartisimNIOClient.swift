@@ -50,7 +50,7 @@ public class CartisimNIOClient {
         let bootstrap: NIOTSConnectionBootstrap
         #if DEBUG || LOCAL
         bootstrap = NIOTSConnectionBootstrap(group: group)
-            .connectTimeout(.seconds(3))
+            .connectTimeout(.seconds(5))
             .channelOption(ChannelOptions.socket(IPPROTO_TCP, TCP_NODELAY), value: 1)
             .channelInitializer { channel in
                 channel.pipeline.addHandlers(self.makeNIOHandlers())

@@ -5,7 +5,7 @@ public final class JSONMessageEncoder<Message: Encodable>: MessageToByteEncoder 
     public typealias OutboundIn = Message
     private let jsonEncoder: JSONEncoder
     
-    init(jsonEncoder: JSONEncoder = JSONEncoder()) {
+    public init(jsonEncoder: JSONEncoder = JSONEncoder()) {
         self.jsonEncoder = jsonEncoder
     }
     
