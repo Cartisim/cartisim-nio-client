@@ -31,29 +31,26 @@ Paste in the URL
 ```
 //Configure the client and get it up and running
 
+import CartisimNIOClient
+
+func startObserving() {
+
 #if DEBUG || LOCAL
 
-cartisimNIOClient = CartisimNIOClient(host: "localhost", port: 8081)
+cartisimNIOClient = CartisimNIOClient(host: "localhost", port: 8081, isEncrytedObject: true)
 
 #else
 
-cartisimNIOClient = CartisimNIOClient(host: "tcp.example.io", port: 3000)
+cartisimNIOClient = CartisimNIOClient(host: "tcp.example.io", port: 3000, isEncrytedObject: true)
 
 #endif
 
-do {
-
-try cartisimNIOClient?.run()
-
-print("Running Server")
-
-} catch {
-
-print(error, "Shutting down Server")
-
-cartisimNIOClient?.shutdown()
+cartisimNIOClient?.connect()
 
 }
+
+//Disconnect
+cartisimNIOClient.disconnect()
 
 //Prepare to receive data and then do something with it
 
@@ -63,18 +60,50 @@ cartisimNIOClient?.onDataReceived = { [weak self] dataObject in
 
 print("do stuff with data \(dataObject)")
 
+//Here are some example of what you can do
+
+guard let strongSelf = self else { return }
+guard let decryptedObject = strongSelf.networkUtility.networkWrapper.someDecryptableResponse(Chatroom.self, string: dataObject.encryptedObjectString) else {return}
+
+//Or
+
+let decryptedName = strongSelf.someCrypto.decryptText(text: dataObject.name, symmetricKey: "key")
+let decryptedMessage = strongSelf.someCrypto.decryptText(text: dataObject.message, symmetricKey: "key")
+
+//If you are encrypting your messages then you can just do whatever you want with your dataObject
+
 }
 
 
-func sendSomeData() {
+func sendSomeObject() {
 
-guard let data = ChatData(ourJsonEncodedData: Data) else {return}
+let encryptMessage = try someCrypto.encryptText(text: "A message", symmetricKey: "key")
+let encryptName = try someCrypto.encryptText(text: "name", symmetricKey: "key")
+
+guard let data = MessageData(avatar: "", userID: "98u3140u5", name: encryptName, message: encryptMessage, accessToken: "accessToken", refreshToken: "refreshToken", sessionID: "908347967", chatSessionID: "092184")
 
 cartisimNIOClient?.send(chat: data)
 
 //After you send your data you probable want to call did receive data
 
-func didReceivedData()
+didReceivedData()
+
+}
+
+//Or if you want to send an encrypted object to your server you can use this code
+
+func sendSomeEncryptedObject() {
+
+let encryptMessage = try someCrypto.encryptText(text: "A message", symmetricKey: "key")
+let encryptName = try someCrypto.encryptText(text: "name", symmetricKey: "key")
+
+let data = networkUtility.networkWrapper.someEncryptableBody(body: MessageData(avatar: "", userID: "98u3140u5", name: encryptName, message: encryptMessage, accessToken: "accessToken", refreshToken: "refreshToken", sessionID: "908347967", chatSessionID: "092184"))
+
+cartisimNIOClient?.sendEncryptedObject(chat: data)
+
+//After you send your data you probable want to call did receive data
+
+didReceivedData()
 
 }
 
@@ -99,7 +128,7 @@ We use [SemVer](http://semver.org/) for versioning. For the versions available, 
 
 * **Cartisim Development* - *Initial work* - [Cartisim](https://cartisim.io)
 
-See also the list of [contributors](https://github.com/Cartisim/cartisim-nio-clientcontributors) who participated in this project.
+See also the list of [contributors](https://github.com/Cartisim/cartisim-nio-client/contributors) who participated in this project.
 
 ## License
 
