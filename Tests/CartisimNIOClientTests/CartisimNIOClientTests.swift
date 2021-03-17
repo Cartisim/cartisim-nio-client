@@ -26,7 +26,7 @@ final class CartisimNIOClientTests: XCTestCase {
         // results.
         let cartisimNIOClient = CartisimNIOClient(host: "localhost", port: 8081, isEncryptedObject: false)
         cartisimNIOClient.connect()
-        cartisimNIOClient.send(chat: object)
+        cartisimNIOClient.send( chat: object)
 
         cartisimNIOClient.onDataReceived = { data in
             print(data)

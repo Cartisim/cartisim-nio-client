@@ -71,21 +71,15 @@ public class CartisimNIOClient {
     
     //Run the program
     public func connect() {
-        let messageSentPromise: EventLoopPromise<Void> = group.next().makePromise()
         let connection = clientBootstrap()
             .connect(host: host, port: port)
             .map { channel -> () in
                 self.channel = channel
             }
-        connection.cascadeFailure(to: messageSentPromise)
-        messageSentPromise.futureResult.map {
-            connection.whenSuccess {
-                guard let address = self.channel?.remoteAddress else {return}
-                print("CartisimNIOClient connected to ChatServer: \(address)")
-            }
-        }.whenFailure { error in
-            print("CartisimNIOClient failed to run for the following reason: \(error)")
-            self.disconnect()
+        do {
+            try connection.wait()
+        } catch {
+            print("There is an error trying to connect to the server: \(error)")
         }
     }
     

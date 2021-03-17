@@ -4,8 +4,6 @@ import NIO
 public final class JSONMessageEncoder<Message: Encodable>: MessageToByteEncoder {
     public typealias OutboundIn = Message
     public let jsonEncoder: JSONEncoder
-    private let channelsSyncQueue = DispatchQueue(label: "channelsQueue")
-    private var channels: [ObjectIdentifier: Channel] = [:]
     
     public init(jsonEncoder: JSONEncoder = JSONEncoder()) {
         self.jsonEncoder = jsonEncoder

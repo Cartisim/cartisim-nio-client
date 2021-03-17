@@ -34,6 +34,7 @@ public final class JSONDecoderHandler<Message: Decodable>: ChannelInboundHandler
     
     public func channelActive(context: ChannelHandlerContext) {
         print("Chat Client connected to \(context.remoteAddress!)")
+        context.fireChannelActive()
     }
     
     public func channelInactive(context: ChannelHandlerContext) {
