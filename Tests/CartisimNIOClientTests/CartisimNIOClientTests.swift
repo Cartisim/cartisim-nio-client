@@ -17,7 +17,7 @@ final class CartisimNIOClientTests: XCTestCase {
             print(data)
         }
         
-//        cartisimNIOClient.disconnect()
+        cartisimNIOClient.disconnect()
     }
     
     func testCartisimNIOClient() {
@@ -32,7 +32,7 @@ final class CartisimNIOClientTests: XCTestCase {
             print(data)
         }
 
-//        cartisimNIOClient.disconnect()
+        cartisimNIOClient.disconnect()
     }
     
     static var allTests = [
