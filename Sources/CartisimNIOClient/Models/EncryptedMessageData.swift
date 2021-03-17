@@ -1,9 +1,9 @@
 import Foundation
 
-public struct EncryptedObject: Codable {
-    public var encryptedObjectString: String
+ struct EncryptedObject: Codable {
+     var encryptedObjectString: String
     
-    public init(encryptedObjectString: String) {
+     init(encryptedObjectString: String) {
         self.encryptedObjectString = encryptedObjectString
     }
 }

@@ -11,26 +11,26 @@ import NIO
 import NIOExtras
 import NIOTransportServices
 
-public class CartisimNIOClient {
+ class CartisimNIOClient {
     
-    private var host: String
-    private var port: Int
+     var host: String
+     var port: Int
     internal var isEncryptedObject: Bool
-    private var channel: Channel? = nil
-    private var jsonDecoderHandler = JSONDecoderHandler<MessageData>(isEncryptedObject: false)
-    private var encryptedJsonDecoderHandler = JSONDecoderHandler<EncryptedObject>(isEncryptedObject: true)
-    private let group = NIOTSEventLoopGroup()
-    public var onDataReceived: ServerDataReceived?
-    public var onEncryptedDataReceived: EncryptedServerDataReceived?
+     var channel: Channel? = nil
+     var jsonDecoderHandler = JSONDecoderHandler<MessageData>(isEncryptedObject: false)
+     var encryptedJsonDecoderHandler = JSONDecoderHandler<EncryptedObject>(isEncryptedObject: true)
+     let group = NIOTSEventLoopGroup()
+     var onDataReceived: ServerDataReceived?
+     var onEncryptedDataReceived: EncryptedServerDataReceived?
     
-    public init(host: String, port: Int, isEncryptedObject: Bool) {
+     init(host: String, port: Int, isEncryptedObject: Bool) {
         self.host = host
         self.port = port
         self.isEncryptedObject = isEncryptedObject
     }
     
     
-    private func makeNIOHandlers() -> [ChannelHandler] {
+     func makeNIOHandlers() -> [ChannelHandler] {
         if isEncryptedObject {
             return [
                 ByteToMessageHandler(LineBasedFrameDecoder()),
@@ -46,7 +46,7 @@ public class CartisimNIOClient {
         }
     }
     
-    private func clientBootstrap() -> NIOTSConnectionBootstrap {
+     func clientBootstrap() -> NIOTSConnectionBootstrap {
         let bootstrap: NIOTSConnectionBootstrap
         #if DEBUG || LOCAL
         bootstrap = NIOTSConnectionBootstrap(group: group)
@@ -70,7 +70,7 @@ public class CartisimNIOClient {
     }
     
     //Run the program
-    public func connect() {
+     func connect() {
         let messageSentPromise: EventLoopPromise<Void> = group.next().makePromise()
         let connection = clientBootstrap()
             .connect(host: host, port: port)
@@ -90,7 +90,7 @@ public class CartisimNIOClient {
     }
     
     //Shutdown the program
-    public func disconnect() {
+     func disconnect() {
         do {
             try group.syncShutdownGracefully()
         } catch {
@@ -101,19 +101,19 @@ public class CartisimNIOClient {
     }
     
     //Send data to the Server
-    public func send(chat: MessageData) {
+     func send(chat: MessageData) {
         channel?.writeAndFlush(chat, promise: nil)
         dataReceived()
     }
     
     
-    public func sendEncryptedObject(chat: EncryptedObject) {
+     func sendEncryptedObject(chat: EncryptedObject) {
         channel?.writeAndFlush(chat, promise: nil)
         dataReceived()
     }
     
     //Handle Data received from server
-    private func dataReceived() {
+     func dataReceived() {
         if isEncryptedObject {
             encryptedJsonDecoderHandler.encryptedDataReceived = { [weak self] data in
                 guard let strongSelf = self else {return}

@@ -1,6 +1,6 @@
 import Foundation
 
-public struct MessageData: Codable {
+ struct MessageData: Codable {
     var avatar: String? = ""
     var userID: String? = ""
     var name: String? = ""
@@ -10,7 +10,7 @@ public struct MessageData: Codable {
     var sessionID: String? = ""
     var chatSessionID: String? = ""
     
-    public init(avatar: String? = "", userID: String? = "", name: String? = "", message: String? = "", accessToken: String? = "", refreshToken: String? = "", sessionID: String? = "", chatSessionID: String? = "") {
+     init(avatar: String? = "", userID: String? = "", name: String? = "", message: String? = "", accessToken: String? = "", refreshToken: String? = "", sessionID: String? = "", chatSessionID: String? = "") {
         self.avatar = avatar
         self.userID = userID
         self.name = name
