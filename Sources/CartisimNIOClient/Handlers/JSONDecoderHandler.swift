@@ -9,40 +9,40 @@
 import NIO
 import Foundation
 
- typealias EncryptedServerDataReceived = (EncryptedObject) -> ()
- typealias ServerDataReceived = (MessageData) -> ()
+public typealias EncryptedServerDataReceived = (EncryptedObject) -> ()
+public typealias ServerDataReceived = (MessageData) -> ()
 
- final class JSONDecoderHandler<Message: Decodable>: ChannelInboundHandler {
-     typealias InboundIn = ByteBuffer
-     typealias InboundOut = Message
-     var isEncryptedObject: Bool
-     let jsonDecoder: JSONDecoder
+public final class JSONDecoderHandler<Message: Decodable>: ChannelInboundHandler {
+    public typealias InboundIn = ByteBuffer
+    public typealias InboundOut = Message
+    public var isEncryptedObject: Bool
+    public let jsonDecoder: JSONDecoder
     
-     init(isEncryptedObject: Bool, jsonDecoder: JSONDecoder = JSONDecoder()) {
+    public init(isEncryptedObject: Bool, jsonDecoder: JSONDecoder = JSONDecoder()) {
         self.isEncryptedObject = isEncryptedObject
         self.jsonDecoder = jsonDecoder
     }
     
     
-     var dataReceived: ServerDataReceived?
-     var encryptedDataReceived: EncryptedServerDataReceived?
+    public var dataReceived: ServerDataReceived?
+    public var encryptedDataReceived: EncryptedServerDataReceived?
     
-     enum ServerResponse {
+    private enum ServerResponse {
         case dataFromServer
         case error(Error)
     }
     
-     func channelActive(context: ChannelHandlerContext) {
+    public func channelActive(context: ChannelHandlerContext) {
         print("Chat Client connected to \(context.remoteAddress!)")
     }
     
     
-     func errorCaught(context: ChannelHandlerContext, error: Error) {
+    public func errorCaught(context: ChannelHandlerContext, error: Error) {
         print("error: ", error)
         context.close(promise: nil)
     }
     
-     var currentlyWaitingFor = ServerResponse.dataFromServer {
+    private var currentlyWaitingFor = ServerResponse.dataFromServer {
         didSet {
             if case .error(let error) = self.currentlyWaitingFor {
                 print(error, "Waiting for errror")
@@ -50,7 +50,7 @@ import Foundation
         }
     }
     
-     func channelRead(context: ChannelHandlerContext, data: NIOAny){
+    public func channelRead(context: ChannelHandlerContext, data: NIOAny){
         switch self.currentlyWaitingFor {
         case .dataFromServer:
             let bytes = self.unwrapInboundIn(data)

@@ -17,7 +17,7 @@ final class CartisimNIOClientTests: XCTestCase {
             print(data)
         }
         
-        cartisimNIOClient.disconnect()
+//        cartisimNIOClient.disconnect()
     }
     
     func testCartisimNIOClient() {
@@ -27,17 +27,17 @@ final class CartisimNIOClientTests: XCTestCase {
         let cartisimNIOClient = CartisimNIOClient(host: "localhost", port: 8081, isEncryptedObject: false)
         cartisimNIOClient.connect()
         cartisimNIOClient.send(chat: object)
-        
+
         cartisimNIOClient.onDataReceived = { data in
             print(data)
         }
-        
-        cartisimNIOClient.disconnect()
+
+//        cartisimNIOClient.disconnect()
     }
     
     static var allTests = [
-        ("testCartisimNIOClient", testCartisimNIOClient),
-        ("testEncryptedCartisimNIOClient", testEncryptedCartisimNIOClient)
+        ("testEncryptedCartisimNIOClient", testEncryptedCartisimNIOClient),
+        ("testCartisimNIOClient", testCartisimNIOClient)
     ]
     
     let encryptedObject = EncryptedObject(encryptedObjectString: "anEncryptedString")

@@ -11,26 +11,26 @@ import NIO
 import NIOExtras
 import NIOTransportServices
 
- class CartisimNIOClient {
+public class CartisimNIOClient {
     
-     var host: String
-     var port: Int
-    internal var isEncryptedObject: Bool
-     var channel: Channel? = nil
-     var jsonDecoderHandler = JSONDecoderHandler<MessageData>(isEncryptedObject: false)
-     var encryptedJsonDecoderHandler = JSONDecoderHandler<EncryptedObject>(isEncryptedObject: true)
-     let group = NIOTSEventLoopGroup()
-     var onDataReceived: ServerDataReceived?
-     var onEncryptedDataReceived: EncryptedServerDataReceived?
+    private var host: String
+    private var port: Int
+    private var isEncryptedObject: Bool
+    private var channel: Channel? = nil
+    private var jsonDecoderHandler = JSONDecoderHandler<MessageData>(isEncryptedObject: false)
+    private var encryptedJsonDecoderHandler = JSONDecoderHandler<EncryptedObject>(isEncryptedObject: true)
+    private let group = NIOTSEventLoopGroup()
+    public var onDataReceived: ServerDataReceived?
+    public var onEncryptedDataReceived: EncryptedServerDataReceived?
     
-     init(host: String, port: Int, isEncryptedObject: Bool) {
+    public init(host: String, port: Int, isEncryptedObject: Bool) {
         self.host = host
         self.port = port
         self.isEncryptedObject = isEncryptedObject
     }
     
     
-     func makeNIOHandlers() -> [ChannelHandler] {
+    private func makeNIOHandlers() -> [ChannelHandler] {
         if isEncryptedObject {
             return [
                 ByteToMessageHandler(LineBasedFrameDecoder()),
@@ -46,11 +46,11 @@ import NIOTransportServices
         }
     }
     
-     func clientBootstrap() -> NIOTSConnectionBootstrap {
+    private func clientBootstrap() -> NIOTSConnectionBootstrap {
         let bootstrap: NIOTSConnectionBootstrap
         #if DEBUG || LOCAL
         bootstrap = NIOTSConnectionBootstrap(group: group)
-            .connectTimeout(.seconds(5))
+            .connectTimeout(.seconds(10))
             .channelOption(ChannelOptions.socket(IPPROTO_TCP, TCP_NODELAY), value: 1)
             .channelInitializer { channel in
                 channel.pipeline.addHandlers(self.makeNIOHandlers())
@@ -70,7 +70,7 @@ import NIOTransportServices
     }
     
     //Run the program
-     func connect() {
+    public func connect() {
         let messageSentPromise: EventLoopPromise<Void> = group.next().makePromise()
         let connection = clientBootstrap()
             .connect(host: host, port: port)
@@ -90,8 +90,9 @@ import NIOTransportServices
     }
     
     //Shutdown the program
-     func disconnect() {
+    public func disconnect() {
         do {
+            try channel?.close().wait()
             try group.syncShutdownGracefully()
         } catch {
             print("Could not gracefully shutdown, Forcing the exit (\(error)")
@@ -101,19 +102,19 @@ import NIOTransportServices
     }
     
     //Send data to the Server
-     func send(chat: MessageData) {
+    public func send(chat: MessageData) {
         channel?.writeAndFlush(chat, promise: nil)
         dataReceived()
     }
     
     
-     func sendEncryptedObject(chat: EncryptedObject) {
+    public func sendEncryptedObject(chat: EncryptedObject) {
         channel?.writeAndFlush(chat, promise: nil)
         dataReceived()
     }
     
     //Handle Data received from server
-     func dataReceived() {
+    private func dataReceived() {
         if isEncryptedObject {
             encryptedJsonDecoderHandler.encryptedDataReceived = { [weak self] data in
                 guard let strongSelf = self else {return}

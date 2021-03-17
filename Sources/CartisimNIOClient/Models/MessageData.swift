@@ -1,16 +1,16 @@
 import Foundation
 
- struct MessageData: Codable {
-    var avatar: String? = ""
-    var userID: String? = ""
-    var name: String? = ""
-    var message: String? = ""
-    var accessToken: String? = ""
-    var refreshToken: String? = ""
-    var sessionID: String? = ""
-    var chatSessionID: String? = ""
+public struct MessageData: Codable {
+    public var avatar: String? = ""
+    public var userID: String? = ""
+    public var name: String? = ""
+    public var message: String? = ""
+    public var accessToken: String? = ""
+    public var refreshToken: String? = ""
+    public var sessionID: String? = ""
+    public var chatSessionID: String? = ""
     
-     init(avatar: String? = "", userID: String? = "", name: String? = "", message: String? = "", accessToken: String? = "", refreshToken: String? = "", sessionID: String? = "", chatSessionID: String? = "") {
+    public init(avatar: String? = "", userID: String? = "", name: String? = "", message: String? = "", accessToken: String? = "", refreshToken: String? = "", sessionID: String? = "", chatSessionID: String? = "") {
         self.avatar = avatar
         self.userID = userID
         self.name = name
