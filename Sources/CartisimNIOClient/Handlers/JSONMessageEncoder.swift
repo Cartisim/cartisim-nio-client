@@ -1,7 +1,7 @@
 import Foundation
 import NIO
 
-public final class JSONMessageEncoder<Message: Encodable>: MessageToByteEncoder {
+ final class JSONMessageEncoder<Message: Encodable>: MessageToByteEncoder {
      typealias OutboundIn = Message
      let jsonEncoder: JSONEncoder
     
