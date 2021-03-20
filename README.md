@@ -37,11 +37,11 @@ func startObserving() {
 
 #if DEBUG || LOCAL
 
-cartisimNIOClient = CartisimNIOClient(host: "localhost", port: 8081, isEncrytedObject: true)
+cartisimNIOClient = CartisimNIOClient(host: "localhost", port: 8081, isEncrytedObject: true, tls: false)
 
 #else
 
-cartisimNIOClient = CartisimNIOClient(host: "tcp.example.io", port: 3000, isEncrytedObject: true)
+cartisimNIOClient = CartisimNIOClient(host: "tcp.example.io", port: 3000, isEncrytedObject: true, tls: false)
 
 #endif
 

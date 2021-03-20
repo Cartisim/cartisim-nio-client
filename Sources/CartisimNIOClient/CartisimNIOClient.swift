@@ -16,6 +16,7 @@ public class CartisimNIOClient {
     private var host: String
     private var port: Int
     private var isEncryptedObject: Bool
+    private var tls: Bool
     private var channel: Channel? = nil
     private var jsonDecoderHandler = JSONDecoderHandler<MessageData>(isEncryptedObject: false)
     private var encryptedJsonDecoderHandler = JSONDecoderHandler<EncryptedObject>(isEncryptedObject: true)
@@ -23,13 +24,17 @@ public class CartisimNIOClient {
     public var onDataReceived: ServerDataReceived?
     public var onEncryptedDataReceived: EncryptedServerDataReceived?
     
-    public init(host: String, port: Int, isEncryptedObject: Bool) {
+    
+    ///Here in our initializer we need to inject our host, port, and whether or not we will be sending an encrypted obejct from the client.
+    ///Client initialitaion will look like this `CartisimNIOClient(host: "localhost", port, 8081, isEncryptedObject: true, tls: Bool)`
+    public init(host: String, port: Int, isEncryptedObject: Bool, tls: Bool) {
         self.host = host
         self.port = port
         self.isEncryptedObject = isEncryptedObject
+        self.tls = tls
     }
     
-    
+    ///Check if we are going to decode and encrypted object or a regular object and user the appropiated handler
     private func makeNIOHandlers() -> [ChannelHandler] {
         if isEncryptedObject {
             return [
@@ -46,30 +51,34 @@ public class CartisimNIOClient {
         }
     }
     
+    ///Setup the bootstrap checked  whether or not we are in debug mode and added in the tls options.
     private func clientBootstrap() -> NIOTSConnectionBootstrap {
         let bootstrap: NIOTSConnectionBootstrap
-        #if DEBUG || LOCAL
-        bootstrap = NIOTSConnectionBootstrap(group: group)
-            .connectTimeout(.seconds(10))
-            .channelOption(ChannelOptions.socket(IPPROTO_TCP, TCP_NODELAY), value: 1)
-            .channelInitializer { channel in
-                channel.pipeline.addHandlers(self.makeNIOHandlers())
-            }
-        #else
-        bootstrap = NIOTSConnectionBootstrap(group: group)
-            .connectTimeout(.hours(1))
-            .channelOption(ChannelOptions.socket(IPPROTO_TCP, TCP_NODELAY), value: 1)
-            .tlsOptions(NWProtocolTLS.Options())
-            .channelInitializer { channel in
-                channel.pipeline.addHandlers(self.makeNIOHandlers())
-            }
-        #endif
+        
+        if !tls {
+            bootstrap = NIOTSConnectionBootstrap(group: group)
+                .connectTimeout(.hours(1))
+                .channelOption(ChannelOptions.socket(IPPROTO_TCP, TCP_NODELAY), value: 1)
+                .channelInitializer { channel in
+                    channel.pipeline.addHandlers(self.makeNIOHandlers())
+                }
+        } else {
+            bootstrap = NIOTSConnectionBootstrap(group: group)
+                .connectTimeout(.hours(1))
+                .channelOption(ChannelOptions.socket(IPPROTO_TCP, TCP_NODELAY), value: 1)
+                .tlsOptions(NWProtocolTLS.Options())
+                .channelInitializer { channel in
+                    channel.pipeline.addHandlers(self.makeNIOHandlers())
+                }
+        }
         
         return bootstrap
         
     }
     
-    //Run the program
+    ///Connect to the server.
+    ///`TodDo: We are not connecting to the server properly, it appears that we neever get a channel to connect to.`
+    
     public func connect() {
         let connection = clientBootstrap()
             .connect(host: host, port: port)
@@ -79,14 +88,13 @@ public class CartisimNIOClient {
         do {
             try connection.wait()
         } catch {
-            print("There is an error trying to connect to the server: \(error)")
+            print("We have an error connecting to the server: \(error)")
         }
     }
     
     //Shutdown the program
     public func disconnect() {
         do {
-            try channel?.close().wait()
             try group.syncShutdownGracefully()
         } catch {
             print("Could not gracefully shutdown, Forcing the exit (\(error)")
@@ -95,19 +103,23 @@ public class CartisimNIOClient {
         print("closed server")
     }
     
-    //Send data to the Server
+    ///Send MessageDataObject to the Server
+    ///- `MssageData(avatar: "", userID: "", name: "", message: "", accessToken: "", refreshToken: "", sessionID: "", chatSessionID: "")`
     public func send(chat: MessageData) {
         channel?.writeAndFlush(chat, promise: nil)
         dataReceived()
     }
     
-    
+    ///Send your object as an encrypted object
+    ///- `EncrytedObject(encryptedObjectString: "")`
     public func sendEncryptedObject(chat: EncryptedObject) {
         channel?.writeAndFlush(chat, promise: nil)
         dataReceived()
     }
     
-    //Handle Data received from server
+    ///Handle Data received from server. We need to specify which decoder handler we are using.
+    ///So if from our client we are sending aan encryptedObject the well we specify the encypted data
+    ///decoder and if it is not then the decoderHandler
     private func dataReceived() {
         if isEncryptedObject {
             encryptedJsonDecoderHandler.encryptedDataReceived = { [weak self] data in

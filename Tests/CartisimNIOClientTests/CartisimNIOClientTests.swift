@@ -8,7 +8,7 @@ final class CartisimNIOClientTests: XCTestCase {
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct
         // results.
-        let cartisimNIOClient = CartisimNIOClient(host: "localhost", port: 8081, isEncryptedObject: true)
+        let cartisimNIOClient = CartisimNIOClient(host: "localhost", port: 8081, isEncryptedObject: true, tls: false)
         cartisimNIOClient.connect()
         
         cartisimNIOClient.sendEncryptedObject(chat: encryptedObject)
@@ -24,7 +24,7 @@ final class CartisimNIOClientTests: XCTestCase {
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct
         // results.
-        let cartisimNIOClient = CartisimNIOClient(host: "localhost", port: 8081, isEncryptedObject: false)
+        let cartisimNIOClient = CartisimNIOClient(host: "localhost", port: 8081, isEncryptedObject: false, tls: false)
         cartisimNIOClient.connect()
         cartisimNIOClient.send( chat: object)
 
