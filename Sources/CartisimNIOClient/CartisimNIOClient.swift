@@ -11,7 +11,7 @@ import NIO
 import NIOExtras
 import NIOTransportServices
 
-public class CartisimNIOClient {
+@objc public class CartisimNIOClient: NSObject {
     
     private var host: String
     private var port: Int
