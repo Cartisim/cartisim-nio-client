@@ -2,6 +2,15 @@
   "object": {
     "pins": [
       {
+        "package": "swift-argument-parser",
+        "repositoryURL": "https://github.com/apple/swift-argument-parser.git",
+        "state": {
+          "branch": null,
+          "revision": "223d62adc52d51669ae2ee19bdb8b7d9fd6fcd9c",
+          "version": "0.0.6"
+        }
+      },
+      {
         "package": "swift-nio",
         "repositoryURL": "https://github.com/apple/swift-nio.git",
         "state": {
@@ -17,6 +26,15 @@
           "branch": null,
           "revision": "de1c80ad1fdff1ba772bcef6b392c3ef735f39a6",
           "version": "1.8.0"
+        }
+      },
+      {
+        "package": "swift-nio-ssl",
+        "repositoryURL": "https://github.com/apple/swift-nio-ssl.git",
+        "state": {
+          "branch": null,
+          "revision": "07c160b8724ee53a4b776328122be6338ff12bf2",
+          "version": "2.11.0"
         }
       },
       {
