@@ -8,11 +8,15 @@
 import Foundation
 import Network
 import NIO
+import NIOSSL
 import NIOExtras
 import NIOTransportServices
+import ArgumentParser
 
-@objc public class CartisimNIOClient: NSObject {
-    
+@available(OSX 10.14, *)
+public class CartisimNIOClient {
+
+    let groupManager: EventLoopGroupManager
     private var host: String
     private var port: Int
     private var isEncryptedObject: Bool
@@ -23,17 +27,18 @@ import NIOTransportServices
     private let group = NIOTSEventLoopGroup()
     public var onDataReceived: ServerDataReceived?
     public var onEncryptedDataReceived: EncryptedServerDataReceived?
-    
-    
+
+
     ///Here in our initializer we need to inject our host, port, and whether or not we will be sending an encrypted obejct from the client.
     ///Client initialitaion will look like this `CartisimNIOClient(host: "localhost", port, 8081, isEncryptedObject: true, tls: Bool)`
-    public init(host: String, port: Int, isEncryptedObject: Bool, tls: Bool) {
+    public init(host: String, port: Int, isEncryptedObject: Bool, tls: Bool, groupProvider provider: EventLoopGroupManager.Provider) {
         self.host = host
         self.port = port
         self.isEncryptedObject = isEncryptedObject
         self.tls = tls
+        self.groupManager = EventLoopGroupManager(provider: provider)
     }
-    
+
     ///Check if we are going to decode and encrypted object or a regular object and user the appropiated handler
     private func makeNIOHandlers() -> [ChannelHandler] {
         if isEncryptedObject {
@@ -50,37 +55,58 @@ import NIOTransportServices
             ]
         }
     }
-    
+
     ///Setup the bootstrap checked  whether or not we are in debug mode and added in the tls options.
-    private func clientBootstrap() -> NIOTSConnectionBootstrap {
-        let bootstrap: NIOTSConnectionBootstrap
-        
+//    private func clientBootstrap() -> NIOTSConnectionBootstrap {
+//        let bootstrap: NIOTSConnectionBootstrap
+//
+//        if !tls {
+//            bootstrap = NIOTSConnectionBootstrap(group: group)
+//                .connectTimeout(.hours(1))
+//                .channelOption(ChannelOptions.socket(IPPROTO_TCP, TCP_NODELAY), value: 1)
+//                .channelInitializer { channel in
+//                    channel.pipeline.addHandlers(self.makeNIOHandlers())
+//                }
+//        } else {
+//            bootstrap = NIOTSConnectionBootstrap(group: group)
+//                .connectTimeout(.hours(1))
+//                .channelOption(ChannelOptions.socket(IPPROTO_TCP, TCP_NODELAY), value: 1)
+//                .tlsOptions(NWProtocolTLS.Options())
+//                .channelInitializer { channel in
+//                    channel.pipeline.addHandlers(self.makeNIOHandlers())
+//                }
+//        }
+//
+//        return bootstrap
+//
+//    }
+    
+    private func clientBootstrap() throws -> NIOClientTCPBootstrap {
+        let bootstrap: NIOClientTCPBootstrap
+
         if !tls {
-            bootstrap = NIOTSConnectionBootstrap(group: group)
+            bootstrap = try groupManager.makeBootstrap(hostname: host, useTLS: false)
                 .connectTimeout(.hours(1))
                 .channelOption(ChannelOptions.socket(IPPROTO_TCP, TCP_NODELAY), value: 1)
                 .channelInitializer { channel in
                     channel.pipeline.addHandlers(self.makeNIOHandlers())
                 }
         } else {
-            bootstrap = NIOTSConnectionBootstrap(group: group)
+            bootstrap = try groupManager.makeBootstrap(hostname: host, useTLS: true)
                 .connectTimeout(.hours(1))
                 .channelOption(ChannelOptions.socket(IPPROTO_TCP, TCP_NODELAY), value: 1)
-                .tlsOptions(NWProtocolTLS.Options())
                 .channelInitializer { channel in
                     channel.pipeline.addHandlers(self.makeNIOHandlers())
                 }
         }
-        
+
         return bootstrap
-        
+
     }
-    
-    ///Connect to the server.
-    ///`TodDo: We are not connecting to the server properly, it appears that we neever get a channel to connect to.`
-    
-    public func connect() {
-        let connection = clientBootstrap()
+
+
+    public func connect() throws {
+        let connection = try clientBootstrap()
             .connect(host: host, port: port)
             .map { channel -> () in
                 self.channel = channel
@@ -91,32 +117,32 @@ import NIOTransportServices
             print("We have an error connecting to the server: \(error)")
         }
     }
-    
+
     //Shutdown the program
     public func disconnect() {
         do {
-            try group.syncShutdownGracefully()
+            try groupManager.syncShutdown()
         } catch {
             print("Could not gracefully shutdown, Forcing the exit (\(error)")
             exit(0)
         }
         print("closed server")
     }
-    
+
     ///Send MessageDataObject to the Server
     ///- `MssageData(avatar: "", userID: "", name: "", message: "", accessToken: "", refreshToken: "", sessionID: "", chatSessionID: "")`
     public func send(chat: MessageData) {
         channel?.writeAndFlush(chat, promise: nil)
         dataReceived()
     }
-    
+
     ///Send your object as an encrypted object
     ///- `EncrytedObject(encryptedObjectString: "")`
     public func sendEncryptedObject(chat: EncryptedObject) {
         channel?.writeAndFlush(chat, promise: nil)
         dataReceived()
     }
-    
+
     ///Handle Data received from server. We need to specify which decoder handler we are using.
     ///So if from our client we are sending aan encryptedObject the well we specify the encypted data
     ///decoder and if it is not then the decoderHandler
