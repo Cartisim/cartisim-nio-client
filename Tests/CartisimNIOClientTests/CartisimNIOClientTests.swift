@@ -9,37 +9,31 @@ final class CartisimNIOClientTests: XCTestCase {
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct
         // results.
-        var group: EventLoopGroup? = nil
-        group = MultiThreadedEventLoopGroup(numberOfThreads: 1)
-        let provider: EventLoopGroupManager.Provider = group.map { .shared($0) } ?? .createNew
-        let cartisimNIOClient = CartisimNIOClient(host: "localhost", port: 8081, isEncryptedObject: true, tls: false, groupProvider: provider)
+        let cartisimNIOClient = CartisimNIOClient(host: "localhost", port: 8081, isEncryptedObject: true, tls: false)
         try? cartisimNIOClient.connect()
         
         cartisimNIOClient.sendEncryptedObject(chat: encryptedObject)
-        
-        cartisimNIOClient.onEncryptedDataReceived = { data in
-            print(data)
+        cartisimNIOClient.niotsHandler?.onDataReceived = { data in
+            
+            print("ENCRYPTED DATA RECIEVED______", data)
         }
         
-        cartisimNIOClient.disconnect()
+        try? cartisimNIOClient.disconnect()
     }
     
     func testCartisimNIOClient() {
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct
         // results.
-        var group: EventLoopGroup? = nil
-        group = MultiThreadedEventLoopGroup(numberOfThreads: 1)
-        let provider: EventLoopGroupManager.Provider = group.map { .shared($0) } ?? .createNew
-        let cartisimNIOClient = CartisimNIOClient(host: "localhost", port: 8081, isEncryptedObject: false, tls: false, groupProvider: provider)
+        let cartisimNIOClient = CartisimNIOClient(host: "localhost", port: 8081, isEncryptedObject: false, tls: false)
         try? cartisimNIOClient.connect()
         cartisimNIOClient.send( chat: object)
 
-        cartisimNIOClient.onDataReceived = { data in
-            print(data)
+        cartisimNIOClient.niotsHandler?.onDataReceived = { data in
+            print("DATA RECIEVED______", data)
         }
 
-        cartisimNIOClient.disconnect()
+        try? cartisimNIOClient.disconnect()
     }
     
     static var allTests = [
