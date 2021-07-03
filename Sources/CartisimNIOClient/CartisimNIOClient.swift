@@ -4,7 +4,6 @@
 //  Created by Cole M on 3/9/21.
 //  Copyright © 2021 Cole M. All rights reserved.
 //
-
 import Foundation
 import Network
 import NIO
@@ -21,7 +20,7 @@ public class CartisimNIOClient {
     private var port: Int
     private var isEncryptedObject: Bool
     private var tls: Bool
-    private var channel: Channel? = nil
+    private var channel: NIO.Channel? = nil
     private var jsonDecoderHandler = JSONDecoderHandler<MessageData>(isEncryptedObject: false)
     private var encryptedJsonDecoderHandler = JSONDecoderHandler<EncryptedObject>(isEncryptedObject: true)
     private let group = NIOTSEventLoopGroup()
@@ -130,7 +129,7 @@ public class CartisimNIOClient {
     }
 
     ///Send MessageDataObject to the Server
-    ///- `MssageData(avatar: "", userID: "", name: "", message: "", accessToken: "", refreshToken: "", sessionID: "", chatSessionID: "")`
+    ///- `MessageData(avatar: "", userID: "", name: "", message: "", accessToken: "", refreshToken: "", sessionID: "", chatSessionID: "")`
     public func send(chat: MessageData) {
         channel?.writeAndFlush(chat, promise: nil)
         dataReceived()
@@ -144,7 +143,7 @@ public class CartisimNIOClient {
     }
 
     ///Handle Data received from server. We need to specify which decoder handler we are using.
-    ///So if from our client we are sending aan encryptedObject the well we specify the encypted data
+    ///So if from our client we are sending an encryptedObject the well we specify the encypted data
     ///decoder and if it is not then the decoderHandler
     private func dataReceived() {
         if isEncryptedObject {

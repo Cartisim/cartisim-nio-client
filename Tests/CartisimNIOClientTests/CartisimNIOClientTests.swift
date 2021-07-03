@@ -3,13 +3,17 @@ import NIO
 @testable import CartisimNIOClient
 
 final class CartisimNIOClientTests: XCTestCase {
+
     
     func testEncryptedCartisimNIOClient() {
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct
         // results.
-        let cartisimNIOClient = CartisimNIOClient(host: "localhost", port: 8081, isEncryptedObject: true, tls: false)
-        cartisimNIOClient.connect()
+        var group: EventLoopGroup? = nil
+        group = MultiThreadedEventLoopGroup(numberOfThreads: 1)
+        let provider: EventLoopGroupManager.Provider = group.map { .shared($0) } ?? .createNew
+        let cartisimNIOClient = CartisimNIOClient(host: "localhost", port: 8081, isEncryptedObject: true, tls: false, groupProvider: provider)
+        try? cartisimNIOClient.connect()
         
         cartisimNIOClient.sendEncryptedObject(chat: encryptedObject)
         
@@ -24,8 +28,11 @@ final class CartisimNIOClientTests: XCTestCase {
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct
         // results.
-        let cartisimNIOClient = CartisimNIOClient(host: "localhost", port: 8081, isEncryptedObject: false, tls: false)
-        cartisimNIOClient.connect()
+        var group: EventLoopGroup? = nil
+        group = MultiThreadedEventLoopGroup(numberOfThreads: 1)
+        let provider: EventLoopGroupManager.Provider = group.map { .shared($0) } ?? .createNew
+        let cartisimNIOClient = CartisimNIOClient(host: "localhost", port: 8081, isEncryptedObject: false, tls: false, groupProvider: provider)
+        try? cartisimNIOClient.connect()
         cartisimNIOClient.send( chat: object)
 
         cartisimNIOClient.onDataReceived = { data in
