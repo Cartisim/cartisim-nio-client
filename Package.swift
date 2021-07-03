@@ -3,8 +3,23 @@
 
 import PackageDescription
 
+var targets: [PackageDescription.Target] = [
+    .target(
+        name: "CartisimNIOClient",
+        dependencies: [
+            .product(name: "NIOExtras", package: "swift-nio-extras"),
+            .product(name: "NIOTransportServices", package: "swift-nio-transport-services"),
+            .product(name: "ArgumentParser", package: "swift-argument-parser"),
+            .product(name: "NIOSSL", package: "swift-nio-ssl"),
+            .product(name: "NIOHTTP1", package: "swift-nio")
+        ]
+    ),
+    .testTarget(name: "CartisimNIOClientTests", dependencies: ["CartisimNIOClient"]),
+
+]
+
 let package = Package(
-    name: "cartisim-nio-client",
+    name: "cartisim-nio",
     products: [
         // Products define the executables and libraries a package produces, and make them visible to other packages.
         .library(name: "CartisimNIOClient", targets: ["CartisimNIOClient"]),
@@ -19,17 +34,5 @@ let package = Package(
         .package(url: "https://github.com/apple/swift-nio-ssl.git", from: "2.7.1"),
         .package(url: "https://github.com/apple/swift-argument-parser.git", .upToNextMinor(from: "0.0.5"))
     ],
-    targets: [
-        .target(
-            name: "CartisimNIOClient",
-            dependencies: [
-                .product(name: "NIOExtras", package: "swift-nio-extras"),
-                .product(name: "NIOTransportServices", package: "swift-nio-transport-services"),
-                .product(name: "ArgumentParser", package: "swift-argument-parser"),
-                .product(name: "NIOSSL", package: "swift-nio-ssl"),
-                .product(name: "NIOHTTP1", package: "swift-nio")
-            ]
-        ),
-        .testTarget(name: "CartisimNIOClientTests", dependencies: ["CartisimNIOClient"]),
-    ]
+    targets: targets
 )

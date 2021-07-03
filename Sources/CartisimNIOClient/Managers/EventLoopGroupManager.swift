@@ -20,7 +20,8 @@ import NIOSSL
 public class EventLoopGroupManager {
     private var group: Optional<EventLoopGroup>
     private let provider: Provider
-    private var sslContext = try! NIOSSLContext(configuration: .forClient())
+
+    private var sslContext = try! NIOSSLContext(configuration: .makeClientConfiguration())
 
     public enum Provider {
         case createNew
